@@ -86,7 +86,7 @@ looks:
     transform: !<BuiltinTransform> {style: ACES-LMT - BLUE_LIGHT_ARTIFACT_FIX}
 
 
-default_view_transform: Output - SDR Video - ACES 1.0
+default_view_transform: Un-tone-mapped
 
 view_transforms:
   - !<ViewTransform>
@@ -290,6 +290,7 @@ display_colorspaces:
     allocation: uniform
     from_display_reference: !<BuiltinTransform> {style: DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.709}
 
+
   - !<ColorSpace>
     name: Display - Rec.1886 / Rec.2020 Video
     family: Display
@@ -395,6 +396,28 @@ colorspaces:
     encoding: sdr-video
     allocation: uniform
     to_scene_reference: !<ExponentTransform> {value: [2.4, 2.4, 2.4, 1], negativeStyle: NEGATIVE_MIRROR}
+
+  - !<ColorSpace>
+    name: ACES - AP0 2.2 gamma
+    family: ACES
+    equalitygroup: ""
+    bitdepth: 32f
+    description: AP0 with 2.2 gamma.
+    isdata: false
+    encoding: sdr-video
+    allocation: uniform
+    to_scene_reference: !<ExponentTransform> {value: [2.2, 2.2, 2.2, 1], negativeStyle: NEGATIVE_MIRROR}
+
+  - !<ColorSpace>
+    name: ACES - AP0 sRGB EOTF
+    family: ACES
+    equalitygroup: ""
+    bitdepth: 32f
+    description: AP0 with sRGB EOTF
+    isdata: false
+    encoding: sdr-video
+    allocation: uniform
+    to_scene_reference: !<ExponentWithLinearTransform> {gamma: 2.4, offset: 0.055}
 
   - !<ColorSpace>
     name: Utility - Raw
