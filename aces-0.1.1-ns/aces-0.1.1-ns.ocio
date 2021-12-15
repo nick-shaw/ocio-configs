@@ -6,11 +6,11 @@ search_path: "luts"
 strictparsing: true
 luma: [0.2126, 0.7152, 0.0722]
 description: |
-  The "Academy Color Encoding System" (ACES) "Reference Config".
+  A modified version of the "Academy Color Encoding System" (ACES) "Reference Config".
   
-  This "OpenColorIO" config is a strict and quasi-analytical implementation of "aces-dev" and is designed as a reference for software developers. It is not a replacement for the previous "ACES" configs nor the "ACES Studio Config".
+  The ACES Reference Config is a strict and quasi-analytical implementation of "aces-dev" and is designed as a reference for software developers. It is not a replacement for the previous "ACES" configs nor the "ACES Studio Config".
   
-  Generated with "OpenColorIO-Config-ACES" v0.1.0-3-g1c7c13e on the 2021/05/15 at 10:16.
+  Original generated with "OpenColorIO-Config-ACES" v0.1.0-3-g1c7c13e on the 2021/05/15 at 10:16.
 
 roles:
   aces_interchange: ACES - ACES2065-1
@@ -48,7 +48,7 @@ shared_views:
 
 displays:
   Display - Apple Display P3:
-    - !<Views> [Output - SDR Video - ACES 1.0,  Output - SDR Video (D60 sim on D65) - ACES 1.0, Output - SDR Video (Rec.709 lim) - ACES 1.1, Output - HDR Video (500 nits & P3 lim) - ACES, Output - HDR Video (1000 nits & P3 lim) - ACES 1.1, Un-tone-mapped]
+    - !<Views> [Output - SDR Video - ACES 1.0,  Output - SDR Video (D60 sim on D65) - ACES 1.0, Output - SDR Video (Rec.709 lim) - ACES 1.1, Output - SDR Video (P3 lim) - ACES 1.1, Output - HDR Video (500 nits & P3 lim) - ACES, Output - HDR Video (1000 nits & P3 lim) - ACES 1.1, Un-tone-mapped]
   Display - sRGB:
     - !<Views> [Output - SDR Video - ACES 1.0, Output - SDR Video (D60 sim on D65) - ACES 1.0, Un-tone-mapped]
   Display - Rec.1886 / Rec.709 Video:
@@ -249,6 +249,23 @@ display_colorspaces:
 
   - !<ColorSpace>
     name: Display - Apple Display P3
+    family: Display
+    equalitygroup: ""
+    bitdepth: 32f
+    description: Convert CIE XYZ (D65 white) to P3-D65 with 2.2 Gamma EOTF
+    isdata: false
+    categories: [file-io]
+    encoding: sdr-video
+    allocation: uniform
+    from_display_reference: !<GroupTransform>
+      children:
+        - !<MatrixTransform> {matrix: [ 2.493496911941426, -0.931383617919124, -0.402710784450717, 0, -0.829488969561575, 1.762664060318346, 0.023624685841944, 0, 0.035845830243784, -0.076172389268042, 0.956884524007687, 0, 0, 0, 0, 1 ]}
+#         - !<ExponentWithLinearTransform> {gamma: 2.4, offset: 0.055, direction: inverse}
+# Piecewise EOTF substituted with pure 2.2 gamma, which is what I measured my Macbook Pro display as being
+        - !<ExponentTransform> {value: [2.2, 2.2, 2.2, 1], direction: inverse}
+
+  - !<ColorSpace>
+    name: Display - Apple Display P3b
     family: Display
     equalitygroup: ""
     bitdepth: 32f
