@@ -1,0 +1,319 @@
+Gizmo {
+ knobChanged nuke.thisNode().knob('L_W').setVisible(nuke.thisNode().knob('inGamma').getValue()==3.0)
+ label "(\[value gamut]\\n\[value inGamma]\\nto P3-D65\\n\[value eotf])"
+ addUserKnob {20 User l "EDR Converter"}
+ addUserKnob {4 gamut l "Input Gamut" t "The primaries of the input image data." M {"ITU-R BT.2020" "ITU-R BT.709" P3-D65 "" ""}}
+ addUserKnob {4 inGamma l "Input EOTF" t "The transfer function of the input image data." -STARTLINE M {ST.2084 BT.1886 sRGB HLG}}
+ addUserKnob {68 eotf l "Output EOTF" t "The assumed EOTF of the EDR display." M {sRGB "Gamma 2.2" "Gamma 2.4" linear}}
+ eotf "Gamma 2.2"
+ addUserKnob {7 L_W l "HLG Peak (nits)" t "The display peak (L_W in BT.2100) for HLG input" +HIDDEN R 200 1000}
+ L_W 1000
+ addUserKnob {7 norm l "Normalisation (nits)" t "Normalisation factor.\n\nThe nit value which will be normalised to 1.0. This is absolute for PQ and HLG, and based on an assumed 100 nit input display for BT.1886 and sRGB.\n\nUseful to e.g. prevent clipping of a 1000 nit PQ signal on the 16\" MacBook Pro's 500 nit display." R 100 200}
+ norm 100
+ addUserKnob {6 clamp1 l "Clamp >1" t "Clamp output values greater than 1.0." +STARTLINE}
+ addUserKnob {6 clamp0 l "Clamp <0" t "Clamp negative output values to zero." +STARTLINE}
+ clamp0 true
+ addUserKnob {26 ""}
+ addUserKnob {26 description l " " T "Converts PQ and other output-referred image data\nto P3 EDR with values greater than 1.0"}
+ addUserKnob {26 version l " " T v1.3.0}
+ addUserKnob {26 copyright l " " T "© Copyright 2022 Nick Shaw, www.antlerpost.com"}
+}
+ Input {
+  inputs 0
+  name Input1
+  xpos 400
+  ypos -432
+ }
+ Dot {
+  name Dot2
+  xpos 434
+  ypos -390
+ }
+set Nc95f2800 [stack 0]
+ Dot {
+  name Dot3
+  xpos 544
+  ypos -390
+ }
+set Nc95f2400 [stack 0]
+ Dot {
+  name Dot9
+  xpos 654
+  ypos -390
+ }
+set Nc95f2000 [stack 0]
+ Dot {
+  name Dot10
+  xpos 754
+  ypos -390
+ }
+ Colorspace {
+  colorspace_in HybridLogGamma
+  primary_in DCI-P3
+  colorspace_out HybridLogGamma
+  primary_out Rec.2020
+  name P3_2020
+  xpos 720
+  ypos -322
+ }
+push $Nc95f2000
+ Colorspace {
+  colorspace_in HybridLogGamma
+  colorspace_out HybridLogGamma
+  primary_out Rec.2020
+  name Rec709_2020
+  xpos 620
+  ypos -321
+ }
+push $Nc95f2400
+ Switch {
+  inputs 3
+  which {{parent.gamut}}
+  name HLG_switch1
+  xpos 620
+  ypos -257
+ }
+ Colorspace {
+  colorspace_in HybridLogGamma
+  primary_in Rec.2020
+  colorspace_out CIE-Yxy
+  name HLG_to_Yxy
+  xpos 620
+  ypos -215
+ }
+ Gamma {
+  value {{"1/(1.2 + 0.42 * log10(L_W / 1000))"} 1 1 1}
+  name HLG_Gamma
+  xpos 620
+  ypos -191
+ }
+ Group {
+  name Yxy_to_lin
+  xpos 620
+  ypos -159
+ }
+  Input {
+   inputs 0
+   name Input1
+   xpos 460
+   ypos -184
+  }
+set Nc95f0800 [stack 0]
+  Colorspace {
+   colorspace_in CIE-Yxy
+   primary_out DCI-P3
+   name Yxy_linP3
+   xpos 564
+   ypos -101
+  }
+push $Nc95f0800
+  Colorspace {
+   colorspace_in CIE-Yxy
+   name Yxy_lin709
+   xpos 460
+   ypos -101
+  }
+push $Nc95f0800
+  Colorspace {
+   colorspace_in CIE-Yxy
+   primary_out Rec.2020
+   name Yxy_lin2020
+   xpos 338
+   ypos -101
+  }
+  Switch {
+   inputs 3
+   which {{parent.parent.gamut}}
+   name Switch1
+   selected true
+   xpos 460
+   ypos -39
+  }
+  Output {
+   name Output1
+   xpos 460
+   ypos 28
+  }
+ end_group
+ Multiply {
+  value {{parent.L_W}}
+  name Multiply3
+  xpos 620
+  ypos -135
+ }
+push $Nc95f2400
+ Colorspace {
+  colorspace_in sRGB
+  name sRGB_to_lin
+  xpos 510
+  ypos -215
+ }
+ Multiply {
+  value 100
+  name Multiply2
+  xpos 510
+  ypos -191
+ }
+push $Nc95f2800
+ Colorspace {
+  colorspace_in 2.40
+  name BT1886_to_lin
+  xpos 400
+  ypos -215
+ }
+ Multiply {
+  value 100
+  name Multiply1
+  xpos 400
+  ypos -191
+ }
+push $Nc95f2800
+ Dot {
+  name Dot1
+  xpos 324
+  ypos -390
+ }
+ Colorspace {
+  colorspace_in st2084
+  primary_in Rec.2020
+  primary_out Rec.2020
+  name PQ_to_lin
+  xpos 290
+  ypos -215
+ }
+ Switch {
+  inputs 4
+  which {{parent.inGamma}}
+  name gammaSwitch
+  xpos 400
+  ypos -98
+ }
+ Dot {
+  name Dot6
+  xpos 434
+  ypos -58
+ }
+set Nc9579400 [stack 0]
+ Dot {
+  name Dot8
+  xpos 556
+  ypos -58
+ }
+push $Nc9579400
+ Colorspace {
+  primary_out DCI-P3
+  name BT709_to_P3
+  xpos 400
+  ypos -17
+ }
+push $Nc9579400
+ Dot {
+  name Dot7
+  xpos 315
+  ypos -59
+ }
+ Colorspace {
+  primary_in Rec.2020
+  primary_out DCI-P3
+  name BT2020_to_P3
+  xpos 281
+  ypos -18
+ }
+ Switch {
+  inputs 3
+  which {{parent.gamut}}
+  name gamutSwitch
+  xpos 400
+  ypos 28
+ }
+ Multiply {
+  value {{"1 / parent.norm"}}
+  name Multiply4
+  xpos 400
+  ypos 72
+ }
+set Nc9513c00 [stack 0]
+ Expression {
+  expr0 "r > 1 ? 1 : r"
+  expr1 "g > 1 ? 1 : g"
+  expr2 "b > 1 ? 1 : b"
+  name Clamp_one
+  xpos 559
+  ypos 76
+ }
+push $Nc9513c00
+ Switch {
+  inputs 2
+  which {{parent.clamp1 x1 0}}
+  name switch_clamp_one
+  xpos 400
+  ypos 135
+ }
+set Nc9541d00 [stack 0]
+ Expression {
+  expr0 "r < 0 ? 0 : r"
+  expr1 "g < 0 ? 0 : g"
+  expr2 "b < 0 ? 0 : b"
+  name Clamp_zero
+  xpos 559
+  ypos 135
+ }
+push $Nc9541d00
+ Switch {
+  inputs 2
+  which {{parent.clamp0 x1 0}}
+  name switch_clamp_zero
+  xpos 400
+  ypos 173
+ }
+set Nc9541600 [stack 0]
+ Dot {
+  name Dot5
+  xpos 695
+  ypos 176
+ }
+push $Nc9541600
+ Colorspace {
+  primary_in DCI-P3
+  colorspace_out 2.40
+  primary_out DCI-P3
+  name gamma24
+  xpos 510
+  ypos 207
+ }
+push $Nc9541600
+ Colorspace {
+  primary_in DCI-P3
+  colorspace_out 2.20
+  primary_out DCI-P3
+  name gamma22
+  xpos 400
+  ypos 207
+ }
+push $Nc9541600
+ Colorspace {
+  primary_in DCI-P3
+  colorspace_out sRGB
+  primary_out DCI-P3
+  name sRGB
+  xpos 290
+  ypos 207
+ }
+ Dot {
+  name Dot4
+  xpos 324
+  ypos 306
+ }
+ Switch {
+  inputs 4
+  which {{parent.eotf x1 0}}
+  name Switch1
+  xpos 400
+  ypos 303
+ }
+ Output {
+  name Output1
+  xpos 400
+  ypos 399
+ }
+end_group

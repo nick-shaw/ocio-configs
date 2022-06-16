@@ -265,25 +265,6 @@ display_colorspaces:
         - !<ExponentTransform> {value: [2.2, 2.2, 2.2, 1], direction: inverse}
 
   - !<ColorSpace>
-    name: Display - Apple Display P3b
-    family: Display
-    equalitygroup: ""
-    bitdepth: 32f
-    description: Convert CIE XYZ (D65 white) to P3-D65 with sRGB piecewise EOTF
-    isdata: false
-    categories: [file-io]
-    encoding: sdr-video
-    allocation: uniform
-    from_display_reference: !<GroupTransform>
-      children:
-        - !<BuiltinTransform> {style: DISPLAY - CIE-XYZ-D65_to_REC.1886-REC.2020}
-        - !<ExponentTransform> {value: [2.4, 2.4, 2.4, 1]}
-        - !<MatrixTransform> {matrix: [ 1.3435782525843325, -0.2821796705261359, -0.06139858205819615, 0, -0.06529745278911941, 1.0757879158485741, -0.010490463059454922, 0, 0.002821787261701055, -0.01959849452449417, 1.0167767072627931, 0, 0, 0, 0, 1 ]}
-#         - !<ExponentWithLinearTransform> {gamma: 2.4, offset: 0.055, direction: inverse}
-# Piecewise EOTF substituted with pure 2.2 gamma, which is what I measured my Macbook Pro display as being
-        - !<ExponentTransform> {value: [0.45454545, 0.45454545, 0.45454545, 1]}
-
-  - !<ColorSpace>
     name: Display - sRGB
     family: Display
     equalitygroup: ""
